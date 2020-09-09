@@ -3,7 +3,12 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Response;
+use Illuminate\Validation\ValidationException;
 use Throwable;
+use WishApp\Model\Exception\ModelNotFoundException;
+use WishApp\Service\Auth\Exception\EmailAlreadyInUseException;
+use WishApp\Service\Auth\Exception\InvalidPasswordException;
 
 class Handler extends ExceptionHandler
 {
@@ -43,13 +48,34 @@ class Handler extends ExceptionHandler
      * Render an exception into an HTTP response.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $exception
+     * @param  \Throwable  $e
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \Throwable
      */
-    public function render($request, Throwable $exception)
+    public function render($request, Throwable $e)
     {
-        return parent::render($request, $exception);
+        if ($e instanceof ValidationException) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'errors' => $e->errors()
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        } elseif ($e instanceof ModelNotFoundException) {
+            return \response()->json([
+                'message' => $e->getMessage()
+            ], Response::HTTP_NOT_FOUND);
+        } elseif ($e instanceof InvalidPasswordException
+            || $e instanceof \InvalidArgumentException
+            || $e instanceof EmailAlreadyInUseException
+        ) {
+            return \response()->json([
+                'message' => $e->getMessage()
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        return \response()->json([
+            'message' => $e->getMessage(),
+            'previous' => $e->getTrace()
+        ], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 }
