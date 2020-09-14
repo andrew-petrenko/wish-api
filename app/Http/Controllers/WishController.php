@@ -10,7 +10,6 @@ use App\Http\Resources\WishResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Ramsey\Uuid\Uuid;
-use Ramsey\Uuid\UuidInterface;
 use WishApp\Service\Wish\Contracts\WishServiceInterface;
 use WishApp\Service\Wish\DTO\CreateWishDTO;
 use WishApp\Service\Wish\DTO\UpdateWishDTO;
@@ -55,7 +54,7 @@ class WishController extends Controller
         return \response()->json(['data' => WishResource::make($wish)], Response::HTTP_OK);
     }
 
-    public function changeGoal(ChangeGoalAmountRequest $request, UuidInterface $uuid): JsonResponse
+    public function changeGoal(ChangeGoalAmountRequest $request, string $uuid): JsonResponse
     {
         $wish = $this->wishService->changeGoalAmount(
             Uuid::fromString($uuid),

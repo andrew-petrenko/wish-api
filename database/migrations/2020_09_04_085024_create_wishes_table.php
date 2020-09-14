@@ -18,7 +18,9 @@ class CreateWishesTable extends Migration
             $table
                 ->foreignUuid('user_id')
                 ->references('id')
-                ->on('users');
+                ->on('users')
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
             $table->string('title');
             $table->integer('goal_amount');
             $table->integer('deposited_amount');

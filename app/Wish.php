@@ -20,8 +20,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Wish extends Model
 {
+    /**
+     * @var bool
+     */
+    public $incrementing = false;
+
+    /**
+     * @var string
+     */
     protected $keyType = 'string';
 
+    /**
+     * @var string[]
+     */
     protected $fillable = [
         'id',
         'user_id',

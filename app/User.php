@@ -19,8 +19,19 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  */
 class User extends Authenticatable implements JWTSubject
 {
+    /**
+     * @var bool
+     */
+    public $incrementing = false;
+
+    /**
+     * @var string
+     */
     protected $keyType = 'string';
 
+    /**
+     * @var string[]
+     */
     protected $fillable = [
         'id',
         'first_name',
@@ -31,6 +42,9 @@ class User extends Authenticatable implements JWTSubject
         'updated_at'
     ];
 
+    /**
+     * @var string[]
+     */
     protected $hidden = [
         'password',
     ];
