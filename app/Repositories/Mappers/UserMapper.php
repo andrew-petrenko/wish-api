@@ -25,9 +25,9 @@ class UserMapper
         );
     }
 
-    public function domainToModel(User $user): UserModel
+    public function domainToModel(User $user, ?UserModel $model = null): UserModel
     {
-        $model = new UserModel();
+        $model = $model ?? new UserModel();
         $model->fill([
             'id' => $user->getId()->toString(),
             'first_name' => $user->getName()->getFirstName()->value(),

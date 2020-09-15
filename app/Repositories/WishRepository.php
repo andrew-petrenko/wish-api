@@ -13,6 +13,9 @@ class WishRepository implements WishRepositoryInterface
 {
     private WishMapper $mapper;
 
+    /** @var WishModel[]|array  */
+    private array $identityMap;
+
     public function __construct(WishMapper $wishMapper)
     {
         $this->mapper = $wishMapper;
@@ -20,10 +23,18 @@ class WishRepository implements WishRepositoryInterface
 
     public function findOneById(UuidInterface $uuid): ?Wish
     {
+        if (isset($this->identityMap[$uuid->toString()])) {
+            $wishModel = $this->identityMap[$uuid->toString()];
+
+            return $this->mapper->modelToDomain($wishModel);
+        }
+
         /** @var WishModel $wishModel */
         if (!$wishModel = WishModel::query()->where(['id' => $uuid->toString()])->first()) {
             return null;
         }
+
+        $this->identityMap[$wishModel->id] = $wishModel;
 
         return $this->mapper->modelToDomain($wishModel);
     }
@@ -37,15 +48,19 @@ class WishRepository implements WishRepositoryInterface
 
     public function save(Wish $wish): void
     {
-        /** @var WishModel $wishModel */
-        $wishModel = WishModel::query()->where(['id' => (string) $wish->getId()])->first();
-        $wishModel = $this->mapper->domainToModel($wish, $wishModel);
+        if (isset($this->identityMap[$wish->getId()->toString()])) {
+            $wishModel = $this->identityMap[$wish->getId()->toString()];
+        } else {
+            $wishModel = WishModel::query()->where(['id' => (string) $wish->getId()])->first();
+        }
 
+        $wishModel = $this->mapper->domainToModel($wish, $wishModel);
         $wishModel->save();
     }
 
     public function delete(UuidInterface $uuid): void
     {
         WishModel::query()->where(['id' => $uuid->toString()])->delete();
+        unset($this->identityMap[$uuid->toString()]);
     }
 }

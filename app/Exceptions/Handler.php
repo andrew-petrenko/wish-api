@@ -64,10 +64,7 @@ class Handler extends ExceptionHandler
             return \response()->json([
                 'message' => $e->getMessage()
             ], Response::HTTP_NOT_FOUND);
-        } elseif ($e instanceof InvalidPasswordException
-            || $e instanceof \InvalidArgumentException
-            || $e instanceof EmailAlreadyInUseException
-        ) {
+        } elseif ($this->isInstanceOfDomainValidationException($e)) {
             return \response()->json([
                 'message' => $e->getMessage()
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
@@ -77,5 +74,15 @@ class Handler extends ExceptionHandler
             'message' => $e->getMessage(),
             'previous' => $e->getTrace()
         ], Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+
+    /**
+     * @TODO refactor domain logic with using structured exceptions
+     */
+    private function isInstanceOfDomainValidationException(Throwable $e): bool
+    {
+        return $e instanceof InvalidPasswordException
+            || $e instanceof \InvalidArgumentException
+            || $e instanceof EmailAlreadyInUseException;
     }
 }
