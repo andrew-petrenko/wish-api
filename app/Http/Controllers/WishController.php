@@ -36,7 +36,7 @@ class WishController extends Controller
     public function create(CreateRequest $request): JsonResponse
     {
         $storeData = CreateWishDTO::createFromArray(
-            array_merge($request->all(), ['user_id' => auth()->user()->id])
+            array_merge($request->validated(), ['user_id' => auth()->user()->id])
         );
         $wish = $this->wishService->create($storeData);
 
@@ -48,7 +48,7 @@ class WishController extends Controller
         $wish = $this->wishService->update(
             Uuid::fromString($uuid),
             Uuid::fromString(auth()->user()->id),
-            UpdateWishDTO::createFromArray($request->all())
+            UpdateWishDTO::createFromArray($request->validated())
         );
 
         return \response()->json(['data' => WishResource::make($wish)], Response::HTTP_OK);
